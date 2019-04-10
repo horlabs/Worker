@@ -41,10 +41,7 @@ apt-get install libimobiledevice-utils ideviceinstaller
 ```
 
 ## Running the Worker
-For archiving (iOS 9 or higher):
-`iproxy 2222 22`
 
-Start the worker:
 `./worker.py -b http://<hostname>.local/`
 
 

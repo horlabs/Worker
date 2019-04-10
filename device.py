@@ -270,7 +270,7 @@ class iDevice(object):
 			try:
 				ssh = SSHClient()
 				ssh.load_system_host_keys()
-				ssh.connect('localhost', port=2222, username='root')
+				ssh.connect(device_handler.device_connection_info(self.udid)[0], username='root')
 				scp = SCPCleint(ssh.get_transport())
 				scp.get(device_ipa, local_path='%s/%s.ipa' % (app_archive_folder, bundleId))
 				scp.close()
