@@ -118,8 +118,13 @@ class Pilot(object):
 		logger.info('execution of %s finished', bundleId)
 		return True
 
-
-
+	def archive(self, bundleId):
+		logger.info("archiving %s", bundleId)
+		r = requests.get("%s/archive/%s" % (self.baseUrl, bundleId))
+		if (r.status_code != 200):
+			logger.error("Failed to archive! <%s> Response: %s" % (bundleId, r.text))
+			return None
+	return r.json()['file']
 
 	def inject(self, process, command, taskInfo={}):
 		data = {

@@ -30,6 +30,9 @@ from enum import Enum
 
 import deviceconnection
 
+from paramiko import SSHClient
+from scp import SCPClient
+
 logger = logging.getLogger('worker.'+__name__)
 
 class iDevice(object):
@@ -255,8 +258,32 @@ class iDevice(object):
 
 		if not os.path.exists(app_archive_folder):
 			os.makedirs(app_archive_folder)
+
+		if self.ios_version()[0] > 8:
+			logger.info("try archiving app %s with tweak" % (bundleId))
+			
+			result = True
+		
+			pilot = Pilot(self.base_url())
+			device_ipa = pilot.archive(bundleId)
+			
+			try:
+				ssh = SSHClient()
+				ssh.load_system_host_keys()
+				ssh.connect('localhost', port=2222, username='root')
+				scp = SCPCleint(ssh.get_transport())
+				scp.get(device_ipa, local_path='%s/%s.ipa' % (app_archive_folder, bundleId))
+				scp.close()
+				ssh.close()
+			except SCPException as e:
+				logger.error('archiving app %s failed with: %s', bundleId, e)
+				result=False
+			
+			return result
+		
 		logger.debug('try archiving app %s with cmd: %s' % (bundleId, ' '.join(options)))
 		result=True
+
 		try:
 			output = subprocess.check_output(options)
 			logger.debug('output: %s' % output)

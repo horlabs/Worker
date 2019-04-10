@@ -246,7 +246,9 @@ class InstallAppJob(Job):
 			bundleId = jobInfo['bundleId']
 	
 			if self.device.ios_version()[0] > 8:
-				logger.debug("skipping app archiving since device is running iOS 9 or later")
+				logger.debug("try archiving app with tweak")
+				if not self.backend.has_app_archive(self.appId):
+					self._archive_app_binary(bundleId)
 			else:
 				logger.debug("check if backend already has an app ipa")
 				if not self.backend.has_app_archive(self.appId):
